@@ -1,0 +1,68 @@
+<% include ./partials/header.ejs %>
+  <div class="w-full min-h-screen bg-zinc-900 px-4 py-5">
+    <form class="border-2 border-zinc-800 flex items-center justify-between px-2 py-1 gap-2" action="/search" method="post" id="searchform">
+        <i class="text-white ri-search-line" id="search"></i>
+        <input class="ml-1 w-full bg-zinc-900 outline-none text-zinc-400" type="text" placeholder="search username" name="username" id="searchbar">
+    </form>
+    <div class="users">
+       
+    </div>
+  </div>
+  <script>
+    var searchbtn = document.getElementById('search');
+    searchbtn.addEventListener('click',function(){
+        var form = document.getElementById('searchform');
+        form.submit();
+    })
+    var clutter = "";
+    var searchbar = document.getElementById('searchbar');
+    var searchform = document.getElementById('searchform');
+
+    document.addEventListener('DOMContentLoaded', function () {
+            document.body.addEventListener('click', function (event) {
+                if (event.target.matches('.profile-link')) {
+                    console.log("Hello")
+                    var usernam = event.target.getAttribute('usernam');
+                    searchbar.value = usernam;
+                    searchform.submit();
+                }
+            });
+        });
+
+
+     searchbar.addEventListener('input', function () {
+            clutter = "";
+            var value = searchbar.value;
+            fetch(`/usernames/${value}`, {
+                method: "POST",
+            })
+
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var users = data.users;
+                    Array.from(users).forEach(user =>{
+                        
+                        clutter += `<div class="outline-none profile-link" usernam ="${user.username}">
+               <div class="text-white flex items-center gap-2 mt-5 profile-link" usernam ="${user.username}">
+                   <div class="image w-[11vw] h-[11vw] rounded-full bg-sky-100 overflow-hidden object-cover object-center profile-link" usernam ="${user.username}">
+                       <img src="/images/uploads/${user.dpImage}" alt="" class="w-full h-full profile-link" usernam ="${user.username}">
+                   </div>
+                   <div class="text profile-link" usernam ="${user.username}">
+                       <h3 class="profile-link" usernam ="${user.username}">${user.name}</h3>
+                       <h4 class="text-xs opacity-30 leading-none profile-link" usernam ="${user.username}">${user.username}</h4>
+                   </div>
+               </div>            
+           </div>`
+                    })
+                    document.querySelector('.users').innerHTML = clutter;
+                })
+                .catch(error => console.error('There was a problem with the fetch operation:', error));
+        })
+      
+  </script>
+<% include ./partials/footer.ejs %>
